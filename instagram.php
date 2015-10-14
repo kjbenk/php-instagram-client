@@ -92,7 +92,7 @@ class NNR_Instagram_v1 {
 
 		$ch = curl_init();
 
-	    curl_setopt($ch, CURLOPT_URL, $access_token_url);
+	    curl_setopt($ch, CURLOPT_URL, $this->access_token_url);
 		curl_setopt($ch, CURLOPT_POST, TRUE);
 	    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -124,9 +124,19 @@ class NNR_Instagram_v1 {
 	 * @param int $count (default: 5)
 	 * @return array $response
 	 */
-	function get_recent_media($user_id, $count = 5) {
+	function get_recent_media($user_id, $count = 5, $min_id = null, $max_id = null) {
 
-		return json_decode($this->get_request("https://api.instagram.com/v1/users/" . $user_id . "/media/recent/?access_token=" . $this->access_token . "&count=" . $count));
+		$ids = '';
+
+		if ( isset($min_id) ) {
+			$ids .= '&min_id=' . $min_id;
+		}
+
+		if ( isset($max_id) ) {
+			$ids .= '&max_id=' . $max_id;
+		}
+
+		return json_decode($this->get_request("https://api.instagram.com/v1/users/" . $user_id . "/media/recent/?access_token=" . $this->access_token . "&count=" . $count . $ids));
 	}
 
 	/**
@@ -137,9 +147,9 @@ class NNR_Instagram_v1 {
 	 * @param int $count (default: 5)
 	 * @return void
 	 */
-	function get_recent_media_from_username($username, $count = 5) {
+	function get_recent_media_from_username($username, $count = 5, $min_id = null, $max_id = null) {
 
-		return json_decode($this->get_request("https://api.instagram.com/v1/users/" . $this->get_user_id_from_name($username) . "/media/recent/?access_token=" . $this->access_token . "&count=" . $count));
+		return $this->get_recent_media($this->get_user_id_from_name($username), $count, $min_id, $max_id);
 	}
 
 	/**
